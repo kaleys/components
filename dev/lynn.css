@@ -12,11 +12,9 @@ body {
 .datepicker {
   background: #fff;
   width: 220px;
-  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
-          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
   border: 1px solid #ddd;
-  -webkit-border-radius: 4px;
-          border-radius: 4px;
+  border-radius: 4px;
 }
 .datepicker .wrap {
   padding: 5px;
@@ -30,8 +28,7 @@ body {
   text-align: center;
 }
 .datepicker td {
-  -webkit-border-radius: 4px;
-          border-radius: 4px;
+  border-radius: 4px;
 }
 .datepicker td:hover,
 .datepicker .title:hover,
@@ -62,12 +59,10 @@ body {
   pointer-events: none;
 }
 .datepicker.end .active.range {
-  -webkit-border-radius: 0 4px 4px 0;
-          border-radius: 0 4px 4px 0;
+  border-radius: 0 4px 4px 0;
 }
 .datepicker.start .active.range {
-  -webkit-border-radius: 4px 0 0 4px;
-          border-radius: 4px 0 0 4px;
+  border-radius: 4px 0 0 4px;
 }
 .datepicker .prev,
 .datepicker .next {
@@ -97,8 +92,7 @@ body {
   position: relative;
   border: 1px solid #ccc;
   padding: 6px 20px 6px 30px;
-  -webkit-border-radius: 3px;
-          border-radius: 3px;
+  border-radius: 3px;
   cursor: pointer;
 }
 .datepicker-input .fa-calendar {
@@ -133,11 +127,9 @@ body {
 .range-datepicker {
   padding: 0 10px 10px;
   background: #fff;
-  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
-          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
   border: 1px solid #ddd;
-  -webkit-border-radius: 4px;
-          border-radius: 4px;
+  border-radius: 4px;
 }
 .range-datepicker .datepicker {
   float: left;
@@ -145,8 +137,7 @@ body {
   margin: 10px 10px 0 0;
   vertical-align: top;
   border: 1px solid #ddd;
-  -webkit-box-shadow: none;
-          box-shadow: none;
+  box-shadow: none;
 }
 .range-datepicker.daterange-show .datepicker {
   display: block;
@@ -166,8 +157,7 @@ body {
   padding: 2px 0;
   text-indent: 16px;
   margin-bottom: 5px;
-  -webkit-border-radius: 2px;
-          border-radius: 2px;
+  border-radius: 2px;
 }
 .range-datepicker .shortcut li:hover,
 .range-datepicker .shortcut li.active {
@@ -190,8 +180,7 @@ body {
 .range-datepicker .ranges-input div input {
   display: table-cell;
   border: 1px solid #ccc;
-  -webkit-border-radius: 4px;
-          border-radius: 4px;
+  border-radius: 4px;
   color: #555;
   font-size: 11px;
   height: 30px;
@@ -204,4 +193,5 @@ body {
   margin-right: 10px;
 }
 
-/*# sourceMappingURL=datepicker.css.map */
+
+/*# sourceMappingURL=lynn.css.map */
