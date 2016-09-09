@@ -1,1 +1,57 @@
+@com-name : bi-pagination;
+@borderC: #ddd;
+@radius:4px;
+@color:#666;
+@activeBg:#1ab394;
+@activeC: #fff;
+@hoverBg: #f4f4f4;
+@disabledC: #ccc;
 
+.@{com-name} {
+	margin-left: 1px;
+	.bi-pages {
+		> a {
+			
+			display: inline-block;
+			margin-left: -1px;
+			padding: 5px 12px;
+			border: 1px solid @borderC;
+			text-align: center;
+			color: @color;
+			cursor: pointer;
+
+			&.active {
+				color: @activeC;
+				background: @activeBg;
+				border-color: @activeBg;
+				&:hover {
+					color: @activeC;
+					background: @activeBg;
+					border-color: @activeBg;
+				}
+			}
+
+			&:hover {
+				background: @hoverBg;
+				border-color: @borderC;
+				color: @color;
+				text-decoration: none;
+			}
+
+			&:first-child {
+				border-radius: @radius 0 0 @radius;
+			}
+			&:last-child {
+				border-radius: 0 @radius @radius 0;
+			}
+
+			&.disabled {
+				color: @disabledC;
+				pointer-events: none;
+
+			}
+		}
+	}
+	
+
+}
