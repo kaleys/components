@@ -43,6 +43,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		nextText: '下一页',
 		onPageClick: loop,
 		perPageFormat: '每页显示%pageSize%条数据',
+		ajax: true,
 		edges: 1
 	};
 	function Pagination(options) {
@@ -74,23 +75,27 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			this.wrap.addEventListener('click', function (e) {
 				var target = e.target,
 				    pageNum = target.getAttribute('data-page');
+				if (that.loading) return false;
 				if (target.className.indexOf('disabled') !== -1 || !pageNum || pageNum === 'etc') return false;
 				switch (pageNum) {
 					case 'prev':
-						that.prev();
+						that.prev(e);
 						break;
 					case 'next':
-						that.next();
+						that.next(e);
 						break;
 					default:
-						that.currentPage = parseInt(pageNum, 10);
-						that.setPageTpl();
+						that.jumpPage(parseInt(pageNum, 10), e);
 						break;
 				}
 				e.preventDefault();
 				e.stopPropagation();
 			});
 			this.perPageSelect.onchange = function (e) {
+				if (that.loading) {
+					that.perPageSelect.value = that.pageSize;
+					return false;
+				}
 				var value = this.value;
 				if (value == that.pageSize) return false;
 				that.pageSize = value;
@@ -116,26 +121,42 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 				if (item === pageSize) option.selected = true;
 				selector.add(option);
 			}
+
 			parent.innerHTML = format.replace(/%([a-z]+)%/gi, "<!--$1-->");
 			var childNode = parent.childNodes;
 			parent.insertBefore(selector, childNode[1]);
 			parent.removeChild(childNode[2]);
 			this.perPageSelect = selector;
 		},
-		setCurrentPage: function setCurrentPage(page) {},
-		next: function next() {
+		next: function next(event) {
 			if (this.currentPage === this.pageCount) return false;
-			this.currentPage++;
-			this.setPageTpl();
+			this.jumpPage(this.currentPage + 1, event);
 		},
-		prev: function prev() {
+		prev: function prev(event) {
 			if (this.currentPage === 1) return false;
-			this.currentPage--;
-			this.setPageTpl();
+			this.jumpPage(this.currentPage - 1, event);
 		},
-		goPage: function goPage() {},
-		setPageTpl: function setPageTpl() {
-			var pages = this.getShowPage(),
+		jumpPage: function jumpPage(page, event) {
+			this.setPageTpl(page);
+			if (this.ajax) {
+				this.loading = true;
+				this.wrap.className += ' bi-p-loading';
+				this.onPageClick.call(null, this.currentPage, event, this.ajaxComplete());
+			} else {
+				this.onPageClick.call(null, this.currentPage, event);
+			}
+		},
+
+		ajaxComplete: function ajaxComplete() {
+			var that = this;
+			return function () {
+				that.wrap.className = that.wrap.className.replace(' bi-p-loading', '');
+				delete that.loading;
+			};
+		},
+
+		setPageTpl: function setPageTpl(page) {
+			var pages = this.getShowPage(page),
 			    wrap = this.wrap.querySelector('.bi-pages'),
 			    tpl = '',
 			    i = 0,
@@ -152,13 +173,14 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			tpl += '<a data-page="next" ' + lastDis + '>' + this.nextText + '</a>';
 			wrap.innerHTML = tpl;
 		},
-		getShowPage: function getShowPage() {
+		getShowPage: function getShowPage(page) {
 			var pageCount = this.pageCount = Math.ceil(this.totalCount / this.pageSize),
 			    showPageCount = this.edges * 2 + this.showItems,
-			    page = this.currentPage = Math.max(Math.min(pageCount, this.currentPage), 1),
+			    page = page || this.currentPage,
 			    startPage,
 			    endPage,
 			    pages = [];
+			page = this.currentPage = Math.max(Math.min(pageCount, page), 1);
 			if (showPageCount >= pageCount) {
 				startPage = 1;
 				endPage = pageCount;
@@ -191,11 +213,20 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			return pages;
 		}
 	};
+
 	Pagination.configs = {
 		clsName: 'bi-pagination'
 	};
 
 	window.Pagination = Pagination;
 
-	var aa = new Pagination();
+	var aa = new Pagination({
+		onPageClick: function onPageClick(currentPage, event, callback) {
+			console.log('正在请求数据', arguments);
+			setTimeout(function () {
+				console.log(11111);
+				callback();
+			}, 2000);
+		}
+	});
 })();

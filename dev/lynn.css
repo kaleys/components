@@ -1,42 +1,3 @@
-.bi-pagination {
-  margin-left: 1px;
-}
-.bi-pagination .bi-pages > a {
-  display: inline-block;
-  margin-left: -1px;
-  padding: 5px 12px;
-  border: 1px solid #ddd;
-  text-align: center;
-  color: #666;
-  cursor: pointer;
-}
-.bi-pagination .bi-pages > a.active {
-  color: #fff;
-  background: #1ab394;
-  border-color: #1ab394;
-}
-.bi-pagination .bi-pages > a.active:hover {
-  color: #fff;
-  background: #1ab394;
-  border-color: #1ab394;
-}
-.bi-pagination .bi-pages > a:hover {
-  background: #f4f4f4;
-  border-color: #ddd;
-  color: #666;
-  text-decoration: none;
-}
-.bi-pagination .bi-pages > a:first-child {
-  border-radius: 4px 0 0 4px;
-}
-.bi-pagination .bi-pages > a:last-child {
-  border-radius: 0 4px 4px 0;
-}
-.bi-pagination .bi-pages > a.disabled {
-  color: #ccc;
-  pointer-events: none;
-}
-
 body {
   font-family: "微软雅黑";
 }
@@ -230,6 +191,52 @@ body {
 }
 .range-datepicker .ranges-input .btn-success {
   margin-right: 10px;
+}
+
+.bi-pagination {
+  margin-left: 1px;
+}
+.bi-pagination .bi-pages > a {
+  display: inline-block;
+  margin-left: -1px;
+  padding: 5px 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+  color: #666;
+  cursor: pointer;
+}
+.bi-pagination .bi-pages > a.active {
+  color: #fff;
+  background: #1ab394;
+  border-color: #1ab394;
+}
+.bi-pagination .bi-pages > a.active:hover {
+  color: #fff;
+  background: #1ab394;
+  border-color: #1ab394;
+}
+.bi-pagination .bi-pages > a:hover {
+  background: #f4f4f4;
+  border-color: #ddd;
+  color: #666;
+  text-decoration: none;
+}
+.bi-pagination .bi-pages > a:first-child {
+  border-radius: 4px 0 0 4px;
+}
+.bi-pagination .bi-pages > a:last-child {
+  border-radius: 0 4px 4px 0;
+}
+.bi-pagination .bi-pages > a.disabled {
+  color: #ccc;
+  pointer-events: none;
+}
+.bi-pagination.bi-p-loading .bi-pages {
+  opacity: .7;
+  filter: alpha(opacity=70);
+}
+.bi-pagination.bi-p-loading .bi-pages > a {
+  pointer-events: none;
 }
 
 /*# sourceMappingURL=lynn.css.map */
