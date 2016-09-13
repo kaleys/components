@@ -9,11 +9,18 @@
     
 </head>
 <body>
-	<select name="" id="aaa">
-		<option value="1">abc123</option>
-		<option value="2">abcccc</option>
-		<option value="3" selected>abcddd</option>
-	</select>
+	
 	<script src="./dev/js/pagination/pagination.js"></script>
+	<script>
+		var aa = new Pagination({
+		onPageClick: function(currentPage,event,callback){
+			console.log('正在请求数据',arguments);
+			setTimeout(function(){
+				console.log(11111);
+				callback();
+			},2000);			
+		}
+	});
+	</script>
 </body>
 </html>

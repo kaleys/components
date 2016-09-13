@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>datagrid</title>
+	<link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/951bd24b38.css">
+    <link rel="stylesheet" href="./dev/lynn.css"/>
+</head>
+<body>
+	<div id="test1">
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th><input type="checkbox" class="check-all" dg-event="checkall"/>全选</th>
+					<th class="sort">标题1 <i class="fa"></i></th>
+					<th class="sort sort-desc">标题2<i class="fa"></i></th>
+					<th class="sort sort-asc">标题3<i class="fa"></i></th>
+					<th class="sort">标题4<i class="fa"></i></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><input type="checkbox"></td>
+					<td>value1</td>
+					<td>value2</td>
+					<td>value3</td>
+					<td>value4</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<script src="dev/js/utils.js"></script>
+	<script src="dev/js/pagination/pagination.js"></script>
+	<script src="dev/js/datagrid/datagrid.js"></script>
+</body>
+</html>

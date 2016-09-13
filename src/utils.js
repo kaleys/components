@@ -1,5 +1,4 @@
 var utils = {
-	
 	debounce (func, wait) {
 	    var timeout, args, context, timestamp, result;
 	    var later = function () {
@@ -22,5 +21,58 @@ var utils = {
 	        return result
 	    }
 	},
+	extend: function(){
+		var options,
+		    name,
+		    src,
+		    copy,
+		    target = arguments[0] || {},
+		    i = 1,
+		    length = arguments.length;
+		// Handle case when target is a string or something (possible in deep copy)
+		if ((typeof target === 'undefined' ? 'undefined' : _typeof(target)) !== "object" && Object.prototype.toString.call(target) === '[object Functon]') {
+			target = {};
+		}
+		for (; i < length; i++) {
+			// Only deal with non-null/undefined values
+			if ((options = arguments[i]) != null) {
+				// Extend the base object
+				for (name in options) {
+					src = target[name];
+					copy = options[name];
+					if (target === copy) {
+						continue;
+					}
+					target[name] = copy;
+				}
+			}
+		}
+		return target;
+	},
+	ajax: function(opts) {
+		var type = (opts.type || 'get').toUpperCase() , xhr, datas = null;
+		xhr = new XMLHttpRequest()
+		xhr.onreadystatechange = function(){
+			if(xhr.readyState === 4) {
+				if(xhr.status == 200 || xhr.status==304) {
+					opts.success && opts.success(JSON.parse(xhr.responseText))
+				}else {
+					opts.fail && opts.fail(xhr)
+				}
+			}
+		}
+		if(type==='POST') {
+			xhr.setRequestHeader('Content-Type',"application/x-www-form-urlencoded")
+		}
+		xhr.open(type,opts.url);
+		if(opts.data && typeof opts.data === 'object') {
+			datas = [];
+			for(var key in opts.data) {
+				datas.push(key+'='+opts.data[key]);
+			}
+			datas.join('&');
+		}
+		xhr.send(datas);
+	}
 
 };

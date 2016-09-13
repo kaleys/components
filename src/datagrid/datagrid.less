@@ -1,0 +1,39 @@
+@com-name:datagrid;
+
+.@{com-name} {
+	.sort {
+		position: relative;
+		cursor: pointer;
+		.fa {
+			position: absolute;
+			right: 10px;
+			line-height: 20px;
+		}
+	}
+	.sort-desc {
+		.fa:before {
+			content: "\f161"
+		}
+	}
+	.sort-asc {
+		.fa:before {
+			content: "\f160"
+		}
+	}
+
+	input[type="checkbox"] {
+		vertical-align: middle;
+		margin: -2px 5px 0 0;
+	}
+
+	.data-loading {
+		height: 80px;
+		text-align: center;
+		font-size: 20px;
+		line-height: 80px;
+	}
+
+	.check-all {
+		width: 38px;
+	}
+}

@@ -43,6 +43,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 		nextText: '下一页',
 		onPageClick: loop,
 		perPageFormat: '每页显示%pageSize%条数据',
+		pageTipFormat: '显示第%start%到第%end%项结果，共%total%项',
 		ajax: true,
 		edges: 1
 	};
@@ -99,7 +100,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 				var value = this.value;
 				if (value == that.pageSize) return false;
 				that.pageSize = value;
-				that.setPageTpl();
+				that.jumpPage(true, event);
 			};
 		},
 		initPerPageTpl: function initPerPageTpl() {
@@ -137,6 +138,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			this.jumpPage(this.currentPage - 1, event);
 		},
 		jumpPage: function jumpPage(page, event) {
+			if (typeof page === 'boolean') {
+				page = null;
+			}
 			this.setPageTpl(page);
 			if (this.ajax) {
 				this.loading = true;
@@ -160,10 +164,16 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			    wrap = this.wrap.querySelector('.bi-pages'),
 			    tpl = '',
 			    i = 0,
+			    tips = { start: (this.currentPage - 1) * this.pageSize + 1,
+				end: Math.min(this.totalCount, this.currentPage * this.pageSize),
+				total: this.totalCount },
 			    len = pages.length,
 			    firstDis = this.currentPage == 1 ? 'class="disabled"' : '',
 			    lastDis = this.currentPage == this.pageCount ? 'class="disabled"' : '';
 
+			tpl += '<span class="tip">' + this.pageTipFormat.replace(/%([a-z]+)%/gi, function (match, key) {
+				return tips[key] || '';
+			}) + '</span>';
 			tpl += '<a data-page="prev" ' + firstDis + '>' + this.prevText + '</a>';
 			for (; i < len; i++) {
 				var item = pages[i] === 'etc' ? '...' : pages[i],
@@ -219,14 +229,4 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 	};
 
 	window.Pagination = Pagination;
-
-	var aa = new Pagination({
-		onPageClick: function onPageClick(currentPage, event, callback) {
-			console.log('正在请求数据', arguments);
-			setTimeout(function () {
-				console.log(11111);
-				callback();
-			}, 2000);
-		}
-	});
 })();
