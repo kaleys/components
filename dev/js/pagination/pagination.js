@@ -151,6 +151,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 			}
 		},
 
+
+		setConfig: function setConfig(opts) {
+			extend(this, opts);
+		},
+
 		ajaxComplete: function ajaxComplete() {
 			var that = this;
 			return function () {

@@ -149,6 +149,11 @@
 			}
 			
 		},
+
+		setConfig: function(opts){
+			extend(this,opts)
+		},
+
 		ajaxComplete: function(){
 			var that = this
 			return function(){
@@ -170,8 +175,8 @@
 				firstDis = this.currentPage == 1 ? 'class="disabled"' : '',
 				lastDis = this.currentPage == this.pageCount ? 'class="disabled"' : ''
 			
-			tpl += '<span class="tip">' +this.pageTipFormat.replace(/%([a-z]+)%/gi,function(match,key){
-					return tips[key]||'';
+			tpl += '<span class="tip">' + this.pageTipFormat.replace(/%([a-z]+)%/gi,function(match,key){
+					return tips[key]||''
 				}) + '</span>';
 			tpl += '<a data-page="prev" '+ firstDis +'>'+ this.prevText +'</a>'
 			for(; i<len; i++) {

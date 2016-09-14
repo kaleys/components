@@ -3,6 +3,7 @@
 	 * @param opts {
 	 *	ele: 初始化元素
 	 *	datas: [{},{},etc.] 初始化数据,如果有这个配置，那么ajax配置将无效
+	 *	id:'id', datas里需要传到后台的id名称
 	 *	thead: {
 	 *		fieldName1: {
 	 *			label: '显示的表头',
@@ -57,80 +58,123 @@
 	DataGrid.prototype = {
 		constructor: DataGrid
 		,init: function(){
-			var thead = this.getThead(),
-				tbody = this.getTbody(true)
 			this.ele.className = DataGrid.config.clsName
-			this.ele.innerHTML = '<table class="table table-bordered">'+ thead + tbody +'</table>'
+			this.initTable()
+			this.updateData()
+			this.initEvent()
 		}
-		,getThead: function(){
-			var theadObj = this.thead, key, th, item,
-				thead = '', cls, theadEle, tds=0
+		,initEvent: function(){
+			var that = this
+			this.ele.addEventListener('click',function(e){
+				e.preventDefault()
+				e.stopPropagation()
+				var target = e.target
+				if(target.name==='ckb-all') {
+					that.clickCheckAll(target)
+					return
+				}else if(target.name==='ckb') {
+					that.clickCheckbox(target)
+					return
+				}
+				if(target.className==='fa'||target.className.indexOf('sort')!==-1) {
+					var th = target.field ? target : target.parentNode
+					that.sortChange(th)
+					return 
+				}
+			})
+
+		}
+		,initTable: function(){
+			var table = document.createElement('table'),
+				thead = table.createTHead().insertRow(0),
+				tbody = document.createElement('tbody'),
+				item = null, cls, index = 0,th
+			table.className = "table table-bordered"
 			if(this.checkabled) {
-				thead +='<th class="check-all"><input type="checkbox"/></th>'
-				tds +=1
+				th = document.createElement('th')
+				th.className = 'check-all'
+				th.innerHTML = '<input name="ckb-all" type="checkbox"/>'
+				index++
+				thead.appendChild(th);
 			}
-			for(key in theadObj) {
-				cls=""
-				item = theadObj[key]
-				if(!item.show){
+			for(var key in this.thead) {
+				cls = ''
+				item = this.thead[key]
+				if(item.show===false) {
 					continue
 				}
-				tds +=1
-				item.sort&&(cls = "sort")
-				if(this.sort&&this.sort.key===key) {
-					this.sort.dir==='DESC' ? cls +=' sort-desc' : cls +=' sort-asc'
+				th = document.createElement('th')
+				th.field = key
+				item.sort&&(cls = 'sort')
+				if(this.sort&&this.sort.key === key) {
+					this.sortTh = th
+					this.sort.dir==='desc' ? cls +=' sort-desc' : cls +=' sort-asc'
 				}
-				thead +='<th class="'+cls+'">'+ item.label +'<i class="fa"></i></th>'
+				th.className = cls
+				th.innerHTML = item.label + '<i class="fa"></i>'
+				thead.appendChild(th);
+				index++
 			}
-			thead = "<thead><tr>" + thead + "<tr><thead>";
-			this.columns = tds;
-			return thead
+			th = tbody.insertRow(-1).insertCell(0)
+			th.setAttribute('colspan',index)
+			th.className = 'data-loading'
+			th.innerHTML = '正在加载数据...'
+			table.appendChild(tbody)
+			this.table ? thie.ele.replaceChild(table,this.table)
+					   : this.ele.appendChild(table)
+			this.table = table
 		}
 		,showLoading: function(){
 			var div = document.createElement('div')
 			div.className = 'loading'
 			this.loadingEle = div
-			this.wrap.appendChild(div)
+			this.ele.appendChild(div)
 		}
 		,hideLoading: function(){
-			this.wrap.removeChild(this.loadingEle)
+			this.ele.removeChild(this.loadingEle)
 		}
 		,setTbody: function(tpl){
 			var div = document.createElement('div')
 			div.innerHTML = '<table>'+tpl+'</table>'
-			var tbody = this.wrap.querySelector('tbody')
-			this.ele.replaceChild(div.firstChild,tbody)
-
+			var tbody = this.ele.querySelector('tbody')
+			this.table.replaceChild(div.firstChild.firstChild, this.table.tBodies[0])
 		}
-		,getTBody: function(init){
-			if(init) {
-				return '<tbody><tr><td class="data-loading" colspan="'+this.columns+'">正在加载数据...</td></tr></tbody>'
-			}
-
+		,updateData: function(){
 			if(this.ajax) {
 				this.ajaxForData();
 			}else if(this.datas) {
-				var tbody = this.getDataTpl(this.datas)
+				var tbodyTpl = this.getDataTpl(this.datas)
+				this.setTbody(tbodyTpl);
 			}
 		}
 		,ajaxForData: function(){
 			if(!this.ajax) {
 				return false;
 			}
-			var that = this, ajax = this.ajax, data
-
+			var that = this, ajax = this.ajax, data = {}
 			that.showLoading();
+			for(var q in this.query) {
+				data.q = this.query[q]
+			}
+			if(this.sort) {
+				data.sort = this.sort.key
+				data.sortDir = this.sort.dir
+			}
 			utils.ajax({
 				url: ajax.url,
+				data : data,
 				success: function(data){
-					data = ajax.formatDatas ? ajax.formatDatas(data) : data
+					data = ajax.formatDatas 
+						? ajax.formatDatas(data) 
+						: data
 					var tbody = that.getDataTpl(data)
-					that.setTbody();
-					that.hideLoading();
+					that.setTbody(tbody)
+					that.hideLoading()
 				},
 				fail: function() {
-					that.hideLoading();
-				}
+					that.hideLoading()
+				},
+
 			})
 			return true;
 		}
@@ -142,14 +186,21 @@
 				value = null,
 				tbody = ''
 			for(var i=0, row; row = datas[i]; i++) {
-				tbody +='<tr>'				
+				tbody +='<tr>'
+				if(this.checkabled) {
+					var id = this.id ? row[this.id] :''
+					tbody +='<td><input name="ckb" type="checkbox" value="'+id+'" /></td>'
+				}			
 				for( key in thead ){
 					item = thead[key]
+					if(item.show === false) continue
 					value = '';
 					if(item.isCustom) {
 						value = item.format ? item.format(row,i) :''
 					}else if(item.format) {
 						value = item.format(row[key],i);
+					}else {
+						value = row[key];
 					}
 					tbody +='<td>'+ value +'</td>'
 				}
@@ -157,6 +208,56 @@
 			}
 			tbody = "<tbody>"+ tbody +"</tbody>"
 			return tbody
+		}
+		,clickCheckAll: function(target){
+			var	status = target.checked,
+				inputs = this.ele.querySelectorAll('input[name="ckb"]')
+			for(var i=0,input; input = inputs[i]; i++) {
+				input.checked = status
+			}
+		}
+		,clickCheckbox: function(target){
+			var checkAll = this.ele.querySelector('input[name="ckb-all"]'),
+				inputs = null,
+				status = target.checked,
+				isAllChecked = true
+			if(status) {
+				inputs = this.ele.querySelectorAll('input[name="ckb"]')
+				for(var i=0,input; input = inputs[i]; i++){
+					if(!input.checked) {
+						isAllChecked = false;
+						break;
+					}
+				}
+				checkAll.checked = isAllChecked
+			}else {
+				checkAll.checked = false
+			}
+		}
+		,getCheckedId: function(){
+			var inputs = this.ele.querySelectorAll('input[name="ckb"]')
+				ids = []
+			for(var i=0,input; input = inputs[i]; i++) {
+				if(input.checked) {
+					ids.push(input.value)
+				}
+			}
+			return ids
+		}
+		,sortChange: function(target){
+			if(!target) return false;
+			var sort = this.sort || {},
+				field = target.field,
+				dir = this.sort.key === field&& this.sort.dir==='desc' ? 'asc' : 'desc'
+			sort.key = field
+			sort.dir = dir
+			this.sort = sort
+			if(this.sortTh!==target) {
+				this.sortTh.className = 'sort'
+				this.sortTh = target;
+			}
+			target.className = 'sort sort-'+dir
+			this.ajaxForData();
 		}
 
 	}
@@ -174,6 +275,7 @@
 		ajax: {
 			url:'./data/datagrid.json'
 		},
+		id:'SellerSKU',
 		thead: {
 			SellerSKU: {
 				label:'SKU',
@@ -182,7 +284,7 @@
 			ProductName: {
 				label:'产品名称',
 				format: function(v) {
-					return v.subStr(0,20)+"..."
+					return v.substr(0,50)+"..."
 				},
 				show: true
 			},
@@ -194,6 +296,7 @@
 			Quantity: {
 				label:'总数量',
 				isCustom: true,
+				sort: true,
 				format: function(row) {
 					return row.TotalSupplyQuantity + row.InStockSupplyQuantity
 				}
@@ -210,7 +313,7 @@
 		},
 		sort: {
 			key:'EarliestAvailabilityDateTime',
-			dir:'DESC'
+			dir:'desc'
 		},
 		query: {
 			ProductName : '你好'

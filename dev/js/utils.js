@@ -60,7 +60,8 @@ var utils = {
 	ajax: function ajax(opts) {
 		var type = (opts.type || 'get').toUpperCase(),
 		    xhr,
-		    datas = null;
+		    datas = null,
+		    url = opts.url;
 		xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState === 4) {
@@ -71,17 +72,21 @@ var utils = {
 				}
 			}
 		};
-		if (type === 'POST') {
-			xhr.setRequestHeader('Content-Type', "application/x-www-form-urlencoded");
-		}
-		xhr.open(type, opts.url);
+
 		if (opts.data && _typeof2(opts.data) === 'object') {
 			datas = [];
 			for (var key in opts.data) {
 				datas.push(key + '=' + opts.data[key]);
 			}
-			datas.join('&');
+			datas = datas.join('&');
 		}
+		if (type === 'POST') {
+			xhr.setRequestHeader('Content-Type', "application/x-www-form-urlencoded");
+		} else {
+			url += (url.indexOf('?') === -1 ? '?' : '&') + datas;
+			datas = '';
+		}
+		xhr.open(type, url);
 		xhr.send(datas);
 	}
 
