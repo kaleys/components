@@ -83,7 +83,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 var trimDate = date.replace(/ /g, ''),
                     dateArray = [],
                     oDate = new Date(0);
-                if (/^(\d{4})\D(\d{1,2})\D(\d{1,2})$/.test(trimDate)) {
+                if (/^(\d{4})\D(\d{1,2})\D(\d{1,2})/.test(trimDate)) {
                     trimDate.replace(/^(\d+)\D(\d+)\D(\d+)/, function (_, a, b, c) {
                         dateArray = [a, b - 1, c];
                         return '';
@@ -248,7 +248,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                     if (this.show) {
                         that.hide();
                     } else {
-                        console.log('show');
                         that.show();
                     }
                 }
@@ -414,7 +413,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             for (var i = 0; i <= 42; i++) {
                 cls = '';
                 i % 7 === 0 && (tbody += '<tr>');
-                item = { value: new Date(startTs).getDate() };
+                //item = {value:new Date(startTs).getDate()};
                 if (startTs < minTimestamp || startTs > maxTimestamp) {
                     cls += ' disabled';
                 }
@@ -613,7 +612,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             if (this.endDate.getTime() < minDate) this.endDate = minDate;
             if (this.endDate.getTime() > maxDate) this.endDate = maxDate;
 
-            this.ele.className += ' range-datepicker-wrap';
+            this.ele.className += ' datepicker-wrap';
             div = document.createElement('div');
             div.className = 'range-datepicker';
             if (this.isCus) {
@@ -935,8 +934,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         to: '止'
     };
 
-    //new Datepicker({ele:document.body,inline:true});
-    new Datepicker({ ele: document.getElementById('date'), format: 'yyyy-mm-dd', minDate: '2016-08-01', maxDate: '2016-09-02', showRange: true });
-    //new Datepicker({ele:document.getElementById('date1')});
-    new RangeDatepicker({ ele: document.getElementById('rangeDate'), maxDate: '2016-09-02' });
+    window.Datepicker = Datepicker;
+    window.RangeDatepicker = RangeDatepicker;
+
+    //new Datepicker({ele:document.getElementById('date'),format:'yyyy-mm-dd',minDate:'2016-08-01',maxDate:'2016-09-02',showRange:true});
+    // new RangeDatepicker({ele:document.getElementById('rangeDate'),maxDate:'2016-09-02'})
+
 })();

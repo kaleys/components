@@ -24,13 +24,12 @@
         }
         return target;
     }
-
     var loop = function(){},
     	defaults = {
     		ele: document.body,
-	    	totalCount:1000,
+	    	totalCount:520,
 	    	currentPage: 1,
-	    	pageSize:10,
+	    	pageSize:100,
 	    	showItems:5,
 	    	prevText:'上一页',
 	    	nextText:'下一页',
@@ -195,17 +194,18 @@
 				startPage, endPage, pages = []
 			page = this.currentPage = Math.max(Math.min(pageCount,page),1)
 			if(showPageCount >= pageCount ) {
-				startPage = 1
-				endPage = pageCount
-			}else {
-				var paddingPage = Math.floor(this.showItems/2)
-				startPage = Math.max(page - paddingPage, this.edges+1)
-				endPage = startPage + this.showItems - 1
-				if(endPage >= pageCount - this.edges) {
-					endPage = pageCount - this.edges
-					startPage = endPage - this.showItems+1
-				} 
+				for(startPage = 1; startPage<=pageCount; startPage++){
+					pages.push(startPage)
+				}
+				return pages
 			}
+			var paddingPage = Math.floor(this.showItems/2)
+			startPage = Math.max(page - paddingPage, this.edges+1)
+			endPage = startPage + this.showItems - 1
+			if(endPage >= pageCount - this.edges) {
+				endPage = pageCount - this.edges
+				startPage = endPage - this.showItems+1
+			} 
 			if(startPage > this.edges+1) {
 				pages.push('etc')
 			}

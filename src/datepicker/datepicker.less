@@ -18,11 +18,19 @@ body {
 
 .@{com-name}-wrap{
 	position: relative;
-	.@{com-name}{
+	.@{com-name},
+    .range-@{com-name}{
 		position: absolute;
 		display: none;
 		z-index: 99;
 	}
+    .range-@{com-name}{
+        &.daterange-show {
+            @media (min-width:602px){
+                width: 602px;
+            }
+        }
+    }
 }
 .@{com-name}{
 	background: @bg;
@@ -112,7 +120,7 @@ body {
 	}	
 }
 
-.@{com-name}-input {
+.@{com-name}-wrap {
     position: relative;
     border: 1px solid #ccc;
     padding: 6px 20px 6px 30px;
@@ -137,22 +145,6 @@ body {
     }
 }
 
-.range-@{com-name}-wrap{
-	position: relative;
-
-	.range-@{com-name}{
-		position: absolute;
-		display: none;
-		z-index: 99;
-		&.daterange-show {
-			@media (min-width:602px){
-				width: 602px;
-			}
-		}
-		
-	}
-}
-
 .range-@{com-name} {
 	padding: 0 10px 10px;
     background: @bg;
@@ -160,6 +152,7 @@ body {
     border: 1px solid @borderC;
     border-radius: @radius;
 	.@{com-name} {
+        position: relative;
 		float: left;
 		display: none;
     	margin: 10px 10px 0 0;

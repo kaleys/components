@@ -14,7 +14,12 @@
 	 *							 这个时候format方法里传入的data是一整行的数据。
 	 *							 如果不是自定义字段，只传入该行中对应的字段数据
 	 *			//显示化显示的内容，返回一段文字
-	 *			format: function(data){return string}
+	 *			format: function(data){return string},
+	 *			//对应列点击回调函数，比如编辑删除
+	 *			onClick: function(row,target){},
+	 *			//初始化时需要调用的函数，比如td里是一个组件，可以在这里进行初始化。
+	 *			init: function(td,v){
+	 *			}
 	 *		}
 	 *		......
 	 *	},
@@ -44,7 +49,6 @@
 	 * 	
 	 * }
 	 */
-	
 	function DataGrid(opts) {
 		utils.extend(this,opts)
 
@@ -52,6 +56,7 @@
 			return false;
 		}
 		this.ele = document.querySelector(this.ele)
+		this.inits = []
 		this.init()
 		
 	}
@@ -61,28 +66,42 @@
 			this.ele.className = DataGrid.config.clsName
 			this.initTable()
 			this.updateData()
+			this.initPagination()
 			this.initEvent()
 		}
 		,initEvent: function(){
 			var that = this
-			this.ele.addEventListener('click',function(e){
-				e.preventDefault()
-				e.stopPropagation()
-				var target = e.target
+			this.table.addEventListener('click',function(e){
+				var target = e.target,td,tempNode,fn
 				if(target.name==='ckb-all') {
-					that.clickCheckAll(target)
-					return
+					that.clickCheckAll(target,e)
+					return false
 				}else if(target.name==='ckb') {
-					that.clickCheckbox(target)
-					return
+					that.clickCheckbox(target,e)
+					return false
 				}
 				if(target.className==='fa'||target.className.indexOf('sort')!==-1) {
 					var th = target.field ? target : target.parentNode
-					that.sortChange(th)
-					return 
+					that.sortChange(th,e)
+					return false
+				}
+				if(target.nodeName === 'TD') {
+					td = target
+				}else {
+					tempNode = target.parentNode
+					while(tempNode && tempNode.nodeName!=='TR') {
+						if(tempNode.nodeName === 'TD'){
+							td = tempNode
+							break;
+						}
+						tempNode = tempNode.parentNode
+					}
+				}
+				if(td&&td.field&&(fn=that.thead[td.field].onClick)) {
+					fn.call(that,that.datas[td.index],target)
+					return false;
 				}
 			})
-
 		}
 		,initTable: function(){
 			var table = document.createElement('table'),
@@ -120,9 +139,21 @@
 			th.className = 'data-loading'
 			th.innerHTML = '正在加载数据...'
 			table.appendChild(tbody)
-			this.table ? thie.ele.replaceChild(table,this.table)
+			this.table ? this.ele.replaceChild(table,this.table)
 					   : this.ele.appendChild(table)
 			this.table = table
+		}
+		,initPagination: function(){
+			var that = this
+			var opts = utils.extend({
+				ele: this.ele,
+				onPageClick: function(currentPage,event,callback) {
+					that.ajaxForData(function(){
+						callback()
+					})
+				}
+			},this.page)
+			this.pagination = new Pagination(opts)
 		}
 		,showLoading: function(){
 			var div = document.createElement('div')
@@ -133,21 +164,25 @@
 		,hideLoading: function(){
 			this.ele.removeChild(this.loadingEle)
 		}
-		,setTbody: function(tpl){
-			var div = document.createElement('div')
-			div.innerHTML = '<table>'+tpl+'</table>'
-			var tbody = this.ele.querySelector('tbody')
-			this.table.replaceChild(div.firstChild.firstChild, this.table.tBodies[0])
+		,setTbody: function(tbody){
+			var table = document.createElement('table')
+			table.appendChild(tbody)
+			this.table.replaceChild(table.tBodies[0], this.table.tBodies[0])
+
+			while(this.inits.length) {
+
+				this.inits.shift()()
+			}
 		}
 		,updateData: function(){
 			if(this.ajax) {
 				this.ajaxForData();
 			}else if(this.datas) {
-				var tbodyTpl = this.getDataTpl(this.datas)
+				var tbodyTpl = this.getDataGrid()
 				this.setTbody(tbodyTpl);
 			}
 		}
-		,ajaxForData: function(){
+		,ajaxForData: function(successFn){
 			if(!this.ajax) {
 				return false;
 			}
@@ -160,6 +195,11 @@
 				data.sort = this.sort.key
 				data.sortDir = this.sort.dir
 			}
+			if(this.pagination){
+				data.page = this.pagination.currentPage
+				data.pageSize = this.pagination.pageSize
+			}
+			this.ele.querySelector('input[name="ckb-all"]').checked = false
 			utils.ajax({
 				url: ajax.url,
 				data : data,
@@ -167,9 +207,10 @@
 					data = ajax.formatDatas 
 						? ajax.formatDatas(data) 
 						: data
-					var tbody = that.getDataTpl(data)
-					that.setTbody(tbody)
+					that.datas = data
+					that.setTbody(that.getDataGrid())
 					that.hideLoading()
+					successFn&&successFn()
 				},
 				fail: function() {
 					that.hideLoading()
@@ -178,45 +219,60 @@
 			})
 			return true;
 		}
-		,getDataTpl: function(datas){
+		,getDataGrid: function(){
 			var thead = this.thead, 
-				arr = [],
-				key = null,
+				datas = this.datas,
 				item = null,
 				value = null,
-				tbody = ''
+				tbody = document.createElement('tbody'),
+				tr = null,
+				td = null,
+				tdIndex = 0,
+				initFn=null
 			for(var i=0, row; row = datas[i]; i++) {
-				tbody +='<tr>'
+				tdIndex = 0
+				tr = tbody.insertRow(i)
 				if(this.checkabled) {
 					var id = this.id ? row[this.id] :''
-					tbody +='<td><input name="ckb" type="checkbox" value="'+id+'" /></td>'
+					tr.insertCell(tdIndex).innerHTML = '<input name="ckb" type="checkbox" value="'+id+'" />'
+					tdIndex++
 				}			
-				for( key in thead ){
+				for(var key in thead ){
 					item = thead[key]
 					if(item.show === false) continue
-					value = '';
 					if(item.isCustom) {
 						value = item.format ? item.format(row,i) :''
 					}else if(item.format) {
-						value = item.format(row[key],i);
+						value = item.format(row[key],i)
 					}else {
-						value = row[key];
+						value = row[key]
 					}
-					tbody +='<td>'+ value +'</td>'
+					td = tr.insertCell(tdIndex)
+					td.innerHTML = value
+					td.field = key
+					td.index = i
+					if(item.init) {
+						this.inits.push((function(fn,td,v){
+							return function(){
+								fn(td,v)
+							}
+						})(item.init,td,item.isCustom ? row : row[key]))
+					}
+
+					tdIndex++
 				}
-				tbody +='</tr>'
 			}
-			tbody = "<tbody>"+ tbody +"</tbody>"
 			return tbody
 		}
-		,clickCheckAll: function(target){
+		,clickCheckAll: function(target,e){
 			var	status = target.checked,
 				inputs = this.ele.querySelectorAll('input[name="ckb"]')
 			for(var i=0,input; input = inputs[i]; i++) {
 				input.checked = status
 			}
+			e&&e.stopPropagation()
 		}
-		,clickCheckbox: function(target){
+		,clickCheckbox: function(target,e){
 			var checkAll = this.ele.querySelector('input[name="ckb-all"]'),
 				inputs = null,
 				status = target.checked,
@@ -233,6 +289,7 @@
 			}else {
 				checkAll.checked = false
 			}
+			e&&e.stopPropagation()
 		}
 		,getCheckedId: function(){
 			var inputs = this.ele.querySelectorAll('input[name="ckb"]')
@@ -244,7 +301,7 @@
 			}
 			return ids
 		}
-		,sortChange: function(target){
+		,sortChange: function(target,e){
 			if(!target) return false;
 			var sort = this.sort || {},
 				field = target.field,
@@ -258,71 +315,12 @@
 			}
 			target.className = 'sort sort-'+dir
 			this.ajaxForData();
+			e&&e.stopPropagation()
 		}
-
 	}
 	DataGrid.config = {
 		clsName:'datagrid'
 	}
-
 	window.DataGrid = DataGrid;
-
-
 	
-	var aa = new DataGrid({
-		ele: "#test1",
-		checkabled: true,
-		ajax: {
-			url:'./data/datagrid.json'
-		},
-		id:'SellerSKU',
-		thead: {
-			SellerSKU: {
-				label:'SKU',
-				show: true,
-			},
-			ProductName: {
-				label:'产品名称',
-				format: function(v) {
-					return v.substr(0,50)+"..."
-				},
-				show: true
-			},
-			PerUnitVolume: {
-				label:'啥啥',
-				show: true,
-				sort: true
-			},
-			Quantity: {
-				label:'总数量',
-				isCustom: true,
-				sort: true,
-				format: function(row) {
-					return row.TotalSupplyQuantity + row.InStockSupplyQuantity
-				}
-			},
-			EarliestAvailabilityDateTime: {
-				label:'生产日期',
-				show: true,
-				sort: true,
-				format: function(v) {
-					var date = new Date(v);
-					return date.getFullYear() + '/' + (date.getMonth()+1) + '/' + date.getDate();
-				}
-			}
-		},
-		sort: {
-			key:'EarliestAvailabilityDateTime',
-			dir:'desc'
-		},
-		query: {
-			ProductName : '你好'
-		},
-		page: {
-			currentPage: 1,
-			pageSize:10,
-			totalCount: 1000
-		}
-	})
-
 })()

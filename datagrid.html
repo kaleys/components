@@ -4,13 +4,90 @@
 	<meta charset="UTF-8">
 	<title>datagrid</title>
 	<link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/951bd24b38.css">
+    <link rel="stylesheet" href="./awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="./dev/lynn.css"/>
 </head>
 <body>
 	<div id="test1"></div>
 	<script src="dev/js/utils.js"></script>
+	<script src="dev/js/datepicker/datepicker.js"></script>
 	<script src="dev/js/pagination/pagination.js"></script>
 	<script src="dev/js/datagrid/datagrid.js"></script>
+	<script>
+		var aa = new DataGrid({
+			ele: "#test1",
+			checkabled: true,
+			ajax: {
+				url:'./data/datagrid.json'
+			},
+			id:'SellerSKU',
+			thead: {
+				SellerSKU: {
+					label:'SKU',
+					show: true,
+				},
+				ProductName: {
+					label:'产品名称',
+					format: function(v) {
+						return v.substr(0,50)+"..."
+					},
+					show: true
+				},
+				PerUnitVolume: {
+					label:'啥啥',
+					show: true,
+					sort: true
+				},
+				Quantity: {
+					label:'总数量',
+					isCustom: true,
+					sort: true,
+					format: function(row) {
+						return row.TotalSupplyQuantity + row.InStockSupplyQuantity
+					}
+				},
+				EarliestAvailabilityDateTime: {
+					label:'生产日期',
+					show: true,
+					sort: true,
+					format: function(v) {
+						return '<div><i class="fa fa-calendar"></i><span class="input" ></span><i class="caret"></i></div>'
+					},
+					init: function(td,v){
+						new Datepicker({
+							ele: td.firstChild,
+							format:'yyyy-mm-dd',
+							date: v
+						})
+					}
+				},
+				actions: {
+					label:'操作',
+					isCustom: true,
+					show: true,
+					format: function(row){
+						return '<a>编辑</a> | <a>删除</a>'
+					},
+					onClick: function(row, target) {
+						alert('是编辑还是删除你自己判断，我有传值给你哦')
+						console.log(row,target);
+					}
+				}
+			},
+			sort: {
+				key:'EarliestAvailabilityDateTime',
+				dir:'desc'
+			},
+			query: {
+				ProductName : '你好'
+			},
+			page: {
+				currentPage: 1,
+				pageSize:10,
+				totalCount: 520
+			}
+		})
+
+	</script>
 </body>
 </html>

@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <title></title>
     <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/951bd24b38.css">
+    <link rel="stylesheet" href="./awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="./dev/lynn.css"/>
 </head>
 <body>
     <div class="container row">
         <form class="col-md-3">
             <label for="">datepicker</label>
-            <div class="datepicker-input" id="date" dp-v="2016-12-01">
+            <div class="" id="date" dp-v="2016-12-01">
                 <i class="fa fa-calendar"></i>
                 <input class="input">
                 <i class="caret"></i>
@@ -19,7 +19,7 @@
         </form>
         <form class="col-md-5">
             <label for="">range datepicker</label>
-            <div class="datepicker-input" id="rangeDate">
+            <div class="" id="rangeDate">
                 <i class="fa fa-calendar"></i>
                 <span class="input" >sdfsdf</span>
                 <i class="caret"></i>
@@ -30,5 +30,9 @@
 
 
     <script src="dev/js/datepicker/datepicker.js"></script>
+    <script>
+        new Datepicker({ele:document.getElementById('date'),format:'yyyy-mm-dd',minDate:'2016-08-01',maxDate:'2016-09-02',showRange:true});
+        new RangeDatepicker({ele:document.getElementById('rangeDate'),maxDate:'2016-09-02'})
+    </script>
 </body>
 </html>
