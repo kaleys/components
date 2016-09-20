@@ -69,13 +69,16 @@ var utils = {
 			}
 			datas = datas.join('&');
 		}
-		if(type==='POST') {
-			xhr.setRequestHeader('Content-Type',"application/x-www-form-urlencoded")
-		}else {
+		if(type==='GET') {
+			
 			url += (url.indexOf('?')===-1 ? '?' : '&') + datas
 			datas = ''
 		}
 		xhr.open(type,url);
+		if(type==='POST'){
+			xhr.setRequestHeader('Content-Type',"application/x-www-form-urlencoded")
+			xhr.setRequestHeader('token','1e4557777b6d42a0af5ea405993c34f6')
+		}
 		xhr.send(datas);
 	}
 

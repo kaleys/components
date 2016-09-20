@@ -88,6 +88,20 @@
 			}
 		})
 
+		utils.ajax({
+			url:'http://192.168.1.70:8001/api/Profit/GetProfit',
+			type:'post',
+			data: {
+				StartDate:'2016-09-19',
+				EndDate:'2016-09-19',
+				GMTOffset:3600,
+				CurrencyId:'EUR',
+			},
+			success: function(data){
+				console.log(data);
+			}
+		})
+
 	</script>
 </body>
 </html>

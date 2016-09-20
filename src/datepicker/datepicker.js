@@ -458,12 +458,14 @@
         },
         setDateFromOut: function(date){
             date = parseDate(date);
+            if(date > this.maxDate || date < this.minDate) return false;
             if(this.focusDate.getTime()===date.getTime()){
                 return false;
             }
             this.focusDate = date;
             this.setDate(date);
             this.dayPanel.innerHTML = this.getDayPanelTpl();
+            return true;
         },
         show: function(){
             if(globalPanel&&globalPanel !== this){
@@ -673,8 +675,8 @@
                 this.isCus&&flag&&(li.className ='active');
                 li.innerHTML = items[i];
                 ul.appendChild(li);
-                startDate = Math.max(startDate,this.minDate);
-                endDate = Math.min(endDate,this.maxDate);
+                /*startDate = Math.max(startDate,this.minDate);
+                endDate = Math.min(endDate,this.maxDate);*/
                 shortCurDate[i]=[startDate,endDate,li];
                 this._shortCutDate = shortCurDate;
             }
@@ -703,7 +705,7 @@
                     }
                 }else if(target.nodeName.toLowerCase()==='li'){
                     var dateType = target._type;
-                    if(!that.changeShortCutStatus(dateType)) return false;
+                    //if(!that.changeShortCutStatus(dateType)) return false;
                     if(dateType==='customeRange'){
                         target.className='';
                         if(!that.isCus) {
@@ -711,11 +713,18 @@
                         }
                     }else {
                         var curItem = that._shortCutDate[dateType], startDate = curItem[0],endDate = curItem[1];
+                        if(that.maxDate) {
+                            endDate =  Math.min(endDate,that.maxDate.getTime());
+                        }
+                        if(that.minDate) {
+                            startDate = Math.max(minDate,that.minDate.getTime());
+                        }
                         that.endPicker.minDate = parseDate(startDate);
                         that.startPicker.maxDate = parseDate(endDate);
-                        that.startPicker.setDateFromOut(startDate,true);
-                        that.endPicker.setDateFromOut(endDate,true);
-                        that.isCus = false;
+                        if(that.startPicker.setDateFromOut(startDate)&&that.endPicker.setDateFromOut(endDate)){
+                            that.changeShortCutStatus(dateType);
+                            that.isCus = false;
+                        }
                         that.setValue();
                         that.hide();
                     }
