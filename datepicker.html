@@ -11,7 +11,7 @@
     <div class="container row">
         <form class="col-md-3">
             <label for="">datepicker</label>
-            <div class="" id="date" dp-v="2016-12-01">
+            <div class="" id="date">
                 <i class="fa fa-calendar"></i>
                 <input class="input">
                 <i class="caret"></i>
@@ -31,8 +31,8 @@
 
     <script src="dev/js/datepicker/datepicker.js"></script>
     <script>
-        new Datepicker({ele:document.getElementById('date'),format:'yyyy-mm-dd',minDate:'2016-08-01',maxDate:'2016-09-02',showRange:true});
-        new RangeDatepicker({ele:document.getElementById('rangeDate'),maxDate:'2016-09-02'})
+        new Datepicker({ele:document.getElementById('date'),format:'yyyy-mm-dd',minDate:'2016-08-01',showRange:true});
+        new RangeDatepicker({ele:document.getElementById('rangeDate')})
     </script>
 </body>
 </html>
